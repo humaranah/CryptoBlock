@@ -58,8 +58,9 @@
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Constants.cs" />
-    <Compile Include="Services\CryptoText.cs" />
-    <Compile Include="Models\EstadoArchivo.cs" />
+    <Compile Include="Models\FileEncryptionData.cs" />
+    <Compile Include="Services\CryptoTextService.cs" />
+    <Compile Include="Models\FileStatus.cs" />
     <Compile Include="Forms\Ventana.cs">
       <SubType>Form</SubType>
     </Compile>

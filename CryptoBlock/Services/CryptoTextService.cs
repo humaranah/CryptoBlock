@@ -7,21 +7,8 @@ using System.Text;
 
 namespace CryptoBlock.Models
 {
-    [Serializable()]
     public class CryptoText
     {
-        [Serializable()]
-        private class Data
-        {
-            public Data()
-            {
-                IV = null;
-                Texto = new List<string>();
-            }
-            public byte[] IV;
-            public List<string> Texto;
-        }
-
         /// <summary>
         /// Importa un archivo
         /// </summary>
@@ -209,14 +196,14 @@ namespace CryptoBlock.Models
         private static string[] abrirAntiguo(string contraseña, string ruta)
         {
             byte[] llave = EncriptarSHA256(contraseña);
-            Data data = new Data();
+            FileEncryptionData data = new FileEncryptionData();
             List<string> ret = new List<string>();
             using (Stream archivo = File.Open(ruta, FileMode.Open))
             {
                 BinaryFormatter bf = new BinaryFormatter();
-                data = (Data)bf.Deserialize(archivo);
+                data = (FileEncryptionData)bf.Deserialize(archivo);
             }
-            foreach (string linea in data.Texto)
+            foreach (string linea in data.Text)
             {
                 ret.Add(DesencriptarAES(linea, EncriptarSHA256(contraseña), data.IV));
             }

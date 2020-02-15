@@ -8,7 +8,7 @@ namespace CryptoBlock
     {
         private string contraseña = null;
         private string ruta = "";
-        private EstadoArchivo estado = EstadoArchivo.Nulo;
+        private FileStatus estado = FileStatus.Null;
         private string titulo = Constants.ApplicationTitle;
 
         public Ventana()
@@ -30,21 +30,21 @@ namespace CryptoBlock
         {
             switch (estado)
             {
-                case EstadoArchivo.SinCrear:
+                case FileStatus.NotCreated:
                     if (saveDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         ruta = saveDialog.FileName;
                         CryptoText.Guardar(txtTexto.Lines, contraseña, ruta);
-                        estado = EstadoArchivo.Guardado;
+                        estado = FileStatus.Saved;
                     }
                     else
                     {
                         return false;
                     }
                     break;
-                case EstadoArchivo.SinGuardar:
+                case FileStatus.Modified:
                     CryptoText.Guardar(txtTexto.Lines, contraseña, ruta);
-                    estado = EstadoArchivo.Guardado;
+                    estado = FileStatus.Saved;
                     break;
             }
             return true;
@@ -52,7 +52,7 @@ namespace CryptoBlock
 
         private bool evalEstado(object sender, EventArgs e)
         {
-            if (estado == EstadoArchivo.SinCrear || estado == EstadoArchivo.SinGuardar)
+            if (estado == FileStatus.NotCreated || estado == FileStatus.Modified)
             {
                 DialogResult result = MessageBox.Show("¿Desea guardar el archivo?",
                     "Archivo sin guardar", MessageBoxButtons.YesNoCancel);
@@ -88,7 +88,7 @@ namespace CryptoBlock
                     this.ActiveControl = txtTexto;
                 }
                 this.Text = "nuevo* - " + titulo;
-                estado = EstadoArchivo.SinCrear;
+                estado = FileStatus.NotCreated;
             }
         }
 
@@ -122,7 +122,7 @@ namespace CryptoBlock
                         txtTexto.Lines = lines;
                     txtTexto.Enabled = true;
                     this.Text = System.IO.Path.GetFileNameWithoutExtension(openDialog.FileName) + " - " + titulo;
-                    estado = EstadoArchivo.Guardado;
+                    estado = FileStatus.Saved;
                 }
             }
         }
@@ -135,7 +135,7 @@ namespace CryptoBlock
 
         private void clicCambiarClave(object sender, EventArgs e)
         {
-            if (estado == EstadoArchivo.Nulo)
+            if (estado == FileStatus.Null)
             {
                 return;
             }
@@ -145,7 +145,7 @@ namespace CryptoBlock
                 contraseña = dialog.Contraseña;
                 guardar();
                 MessageBox.Show("La contraseña se guardó con éxito");
-                estado = EstadoArchivo.Guardado;
+                estado = FileStatus.Saved;
             }
         }
 
@@ -176,7 +176,7 @@ namespace CryptoBlock
 
         private void clicFuente(object sender, EventArgs e)
         {
-            if (estado == EstadoArchivo.Nulo)
+            if (estado == FileStatus.Null)
             {
                 return;
             }
@@ -203,8 +203,8 @@ namespace CryptoBlock
 
         private void cambioTexto(object sender, EventArgs e)
         {
-            if (estado == EstadoArchivo.Guardado)
-                estado = EstadoArchivo.SinGuardar;
+            if (estado == FileStatus.Saved)
+                estado = FileStatus.Modified;
             this.Text = System.IO.Path.GetFileNameWithoutExtension(openDialog.FileName) + "* - " + titulo;
         }
 
@@ -216,7 +216,7 @@ namespace CryptoBlock
 
         private void clicExportar(object sender, EventArgs e)
         {
-            if (estado == EstadoArchivo.Nulo)
+            if (estado == FileStatus.Null)
                 return;
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Filter = "Archivo de texto|*.txt";
