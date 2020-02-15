@@ -14,42 +14,23 @@ namespace CryptoBlock
 
         private void OnAcceptClicked(object sender, EventArgs e)
         {
-            if (PasswordField.Text == "")
+            if (string.IsNullOrEmpty(PasswordField.Text))
             {
                 MessageBox.Show("Password can't be empty.");
                 return;
             }
 
-            DialogResult = System.Windows.Forms.DialogResult.OK;
+            DialogResult = DialogResult.OK;
         }
 
         private void OnShowCharactersClicked(object sender, EventArgs e)
         {
-            if (ShowCharactersCheckbox.Checked)
-            {
-                PasswordField.UseSystemPasswordChar = false;
-            }
-            else
-            {
-                PasswordField.UseSystemPasswordChar = true;
-            }
+            PasswordField.UseSystemPasswordChar = !ShowCharactersCheckbox.Checked;
         }
 
-        public string Password
-        {
-            get
-            {
-                return PasswordField.Text;
-            }
-        }
+        public string Password => PasswordField.Text;
 
-        public string Path
-        {
-            get
-            {
-                return ImportTextField.Text;
-            }
-        }
+        public string Path => ImportTextField.Text;
 
         private void OnImportClicked(object sender, EventArgs e)
         {
