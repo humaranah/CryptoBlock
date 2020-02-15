@@ -13,7 +13,7 @@ namespace CryptoBlock
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Ventana());
+            Application.Run(new MainWinidow());
         }
     }
 }

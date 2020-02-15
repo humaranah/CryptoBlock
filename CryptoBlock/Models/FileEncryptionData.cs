@@ -1,18 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CryptoBlock.Models
 {
-    [Serializable]
-    public class FileEncryptionData
+    public sealed class FileEncryptionData
     {
-        public FileEncryptionData()
+        private readonly byte[] _initVector;
+
+        private FileEncryptionData()
         {
-            Text = new List<string>();
+            TextLines = new List<string>();
         }
 
-        public byte[] IV { get; set; }
+        public FileEncryptionData(byte[] initVector) : this()
+        {
+            _initVector = initVector;
+        }
 
-        public List<string> Text { get; set; }
+        public FileEncryptionData(List<string> fileContentLines) : this()
+        {
+            _initVector = Convert.FromBase64String(fileContentLines.First());
+
+            if (fileContentLines.Count > 1)
+            {
+                TextLines.AddRange(fileContentLines.Skip(1));
+            }
+        }
+
+        public List<string> TextLines { get; set; }
+
+        public byte[] GetInitVector()
+        {
+            return (byte[])_initVector.Clone();
+        }
+
+        public List<string> ToFileContentLines()
+        {
+            var contentList = new List<string> { Convert.ToBase64String(_initVector) };
+            contentList.AddRange(TextLines);
+            return contentList;
+        }
     }
 }
