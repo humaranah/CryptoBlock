@@ -25,7 +25,7 @@ namespace CryptoBlock
         protected override void OnLoad(EventArgs e)
         {
             TextArea.Font = Properties.Settings.Default.EditorFont;
-            WordWrapOption.Checked = Properties.Settings.Default.WordWrap;
+            WordWrapMenuEntry.Checked = Properties.Settings.Default.WordWrap;
             Height = Properties.Settings.Default.Height;
             Width = Properties.Settings.Default.Width;
             base.OnLoad(e);
@@ -52,7 +52,7 @@ namespace CryptoBlock
             return true;
         }
 
-        private bool IsValidState(object sender, EventArgs e)
+        private bool TrySaveModified()
         {
             if (_textViewModel.FileStatus == FileStatus.NotCreated || _textViewModel.FileStatus == FileStatus.Modified)
             {
@@ -74,22 +74,22 @@ namespace CryptoBlock
 
         private void OnCreateFile(object sender, EventArgs e)
         {
-            if (!IsValidState(sender, e))
+            if (!TrySaveModified())
             {
                 return;
             }
 
-            var dialog = new InputDialog("Create file", true)
+            var dialog = new NewFileDialog("Create file", true)
             {
                 StartPosition = FormStartPosition.CenterParent
             };
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                _textViewModel.Base64Key = _cryptoServiceFacade.EncryptPassword(dialog.Contraseña);
+                _textViewModel.Base64Key = _cryptoServiceFacade.EncryptPassword(dialog.Password);
                 TextArea.Enabled = true;
 
-                if (dialog.RutaImportar == "")
+                if (dialog.Path == "")
                 {
                     TextArea.Text = "";
                     ActiveControl = TextArea;
@@ -97,7 +97,7 @@ namespace CryptoBlock
                 else
                 {
                     TextArea.Lines = _cryptoServiceFacade
-                        .ImportFromTextFile(dialog.RutaImportar)
+                        .ImportFromTextFile(dialog.Path)
                         .ToArray();
                 }
 
@@ -109,19 +109,22 @@ namespace CryptoBlock
         private void OnOpenFile(object sender, EventArgs e)
         {
             string[] lines;
-            InputDialog dialog;
+            NewFileDialog dialog;
 
-            if (!IsValidState(sender, e))
+            if (!TrySaveModified())
                 return;
 
             if (openDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 _textViewModel.FilePath = openDialog.FileName;
-                dialog = new InputDialog("Open file");
-                dialog.StartPosition = FormStartPosition.CenterParent;
+                dialog = new NewFileDialog("Open file")
+                {
+                    StartPosition = FormStartPosition.CenterParent
+                };
+
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    _textViewModel.Base64Key = _cryptoServiceFacade.EncryptPassword(dialog.Contraseña);
+                    _textViewModel.Base64Key = _cryptoServiceFacade.EncryptPassword(dialog.Password);
                     lines = _cryptoServiceFacade
                         .LoadFile(_textViewModel.FilePath, _textViewModel.Base64Key)
                         .ToArray();
@@ -147,10 +150,10 @@ namespace CryptoBlock
             {
                 return;
             }
-            InputDialog dialog = new InputDialog("New password");
+            NewFileDialog dialog = new NewFileDialog("New password");
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                _textViewModel.Base64Key = _cryptoServiceFacade.EncryptPassword(dialog.Contraseña);
+                _textViewModel.Base64Key = _cryptoServiceFacade.EncryptPassword(dialog.Password);
                 Save();
                 MessageBox.Show("Password updated!");
                 _textViewModel.FileStatus = FileStatus.Saved;
@@ -190,7 +193,7 @@ namespace CryptoBlock
             }
 
             fontDialog.Font = TextArea.Font;
-            if (fontDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (fontDialog.ShowDialog() == DialogResult.OK)
             {
                 TextArea.Font = fontDialog.Font;
                 Properties.Settings.Default.EditorFont = TextArea.Font;
@@ -205,8 +208,11 @@ namespace CryptoBlock
 
         private void OnAboutButtonClick(object sender, EventArgs e)
         {
-            AboutDialog dialog = new AboutDialog();
-            dialog.StartPosition = FormStartPosition.CenterParent;
+            var dialog = new AboutDialog
+            {
+                StartPosition = FormStartPosition.CenterParent
+            };
+
             dialog.ShowDialog();
         }
 
@@ -223,7 +229,7 @@ namespace CryptoBlock
 
         private void OnWordWrapButtonClick(object sender, EventArgs e)
         {
-            WordWrapOption.Checked = !WordWrapOption.Checked;
+            WordWrapMenuEntry.Checked = !WordWrapMenuEntry.Checked;
             Properties.Settings.Default.Save();
         }
 
@@ -245,13 +251,13 @@ namespace CryptoBlock
 
         private void OnCheckWordWrap(object sender, EventArgs e)
         {
-            TextArea.WordWrap = WordWrapOption.Checked;
-            Properties.Settings.Default.WordWrap = WordWrapOption.Checked;
+            TextArea.WordWrap = WordWrapMenuEntry.Checked;
+            Properties.Settings.Default.WordWrap = WordWrapMenuEntry.Checked;
         }
 
         private void OnCloseWindow(object sender, FormClosingEventArgs e)
         {
-            if (!IsValidState(sender, e))
+            if (!TrySaveModified())
                 e.Cancel = true;
         }
 

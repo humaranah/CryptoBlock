@@ -1,67 +1,61 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CryptoBlock
 {
-    public partial class InputDialog : Form
+    public partial class NewFileDialog : Form
     {
-        public InputDialog(string titulo = "", bool importar = false)
+        public NewFileDialog(string title = "", bool isImportPanelVisible = false)
         {
             InitializeComponent();
-            this.Text = titulo;
-            pnlImportar.Visible = importar;
+            Text = title;
+            ImportPanel.Visible = isImportPanelVisible;
         }
 
-        private void clicAceptar(object sender, EventArgs e)
+        private void OnAcceptClicked(object sender, EventArgs e)
         {
-            if (txtContraseña.Text == "")
+            if (PasswordField.Text == "")
             {
-                MessageBox.Show("La contraseña está en blanco.");
+                MessageBox.Show("Password can't be empty.");
                 return;
             }
-            this.DialogResult = System.Windows.Forms.DialogResult.OK;
+
+            DialogResult = System.Windows.Forms.DialogResult.OK;
         }
 
-        private void seleccionMostrar(object sender, EventArgs e)
+        private void OnShowCharactersClicked(object sender, EventArgs e)
         {
-            if (chkMostrar.Checked)
+            if (ShowCharactersCheckbox.Checked)
             {
-                txtContraseña.UseSystemPasswordChar = false;
+                PasswordField.UseSystemPasswordChar = false;
             }
             else
             {
-                txtContraseña.UseSystemPasswordChar = true;
+                PasswordField.UseSystemPasswordChar = true;
             }
         }
 
-        public String Contraseña
+        public string Password
         {
             get
             {
-                return txtContraseña.Text;
+                return PasswordField.Text;
             }
         }
 
-        public String RutaImportar
+        public string Path
         {
             get
             {
-                return txtImportar.Text;
+                return ImportTextField.Text;
             }
         }
 
-        private void clicImportar(object sender, EventArgs e)
+        private void OnImportClicked(object sender, EventArgs e)
         {
-            if (openDialog.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
+            if (openDialog.ShowDialog(this) == DialogResult.OK)
             {
-                txtImportar.Text = openDialog.FileName;
+                ImportTextField.Text = openDialog.FileName;
             }
         }
     }
